@@ -1,0 +1,58 @@
+<%_
+const moduleName = name.charAt(0).toUpperCase() + name.slice(1);
+_%>
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { <%= name %>, <%= documentName %> } from '../../<%= inputPath %>';
+import { Create<%= moduleName %>Dto } from './dto/create-<%= name.toLowerCase() %>.dto';
+import { Update<%= moduleName %>Dto } from './dto/update-<%= name.toLowerCase() %>.dto';
+import { Get<%= moduleName %>ListDto } from './dto/get-list-<%= name.toLowerCase() %>.dto';
+import { <%= moduleName %>ResponseDto } from './dto/response-<%= name.toLowerCase() %>.dto';
+import { <%= moduleName %>Mapper } from './<%= name.toLowerCase() %>.mapper';
+
+@Injectable()
+export class <%= moduleName %>Service {
+  constructor(
+    @InjectModel(<%= moduleName %>.name) private readonly <%= name.toLowerCase() %>Model: Model<<%= documentName %>>,
+    private readonly <%= name.toLowerCase() %>Mapper: <%= moduleName %>Mapper,
+  ) {}
+
+  async create(dto: Create<%= moduleName %>Dto): Promise<<%= moduleName %>ResponseDto> {
+    const <%= name.toLowerCase() %> = await this.<%= name.toLowerCase() %>Model.create(dto);
+    return this.<%= name.toLowerCase() %>Mapper.to<%= moduleName %>ResponseDto(<%= name.toLowerCase() %>);
+  }
+
+  async update(id: string, dto: Update<%= moduleName %>Dto): Promise<<%= moduleName %>ResponseDto> {
+    const <%= name.toLowerCase() %> = await this.<%= name.toLowerCase() %>Model.findByIdAndUpdate(id, dto, { new: true });
+    if (!<%= name.toLowerCase() %>) throw new NotFoundException('<%= moduleName %> not found');
+    return this.<%= name.toLowerCase() %>Mapper.to<%= moduleName %>ResponseDto(<%= name.toLowerCase() %>);
+  }
+
+  async delete(id: string): Promise<void> {
+    const result = await this.<%= name.toLowerCase() %>Model.findByIdAndDelete(id);
+    if (!result) throw new NotFoundException('<%= moduleName %> not found');
+  }
+
+  async findOne(id: string): Promise<<%= moduleName %>ResponseDto> {
+    const <%= name.toLowerCase() %> = await this.<%= name.toLowerCase() %>Model.findById(id);
+    if (!<%= name.toLowerCase() %>) throw new NotFoundException('<%= moduleName %> not found');
+    return this.<%= name.toLowerCase() %>Mapper.to<%= moduleName %>ResponseDto(<%= name.toLowerCase() %>);
+  }
+
+  async findAll(query: Get<%= moduleName %>ListDto): Promise<<%= moduleName %>ResponseDto[]> {
+    const { page = 1, limit = 10, ...filters } = query;
+
+    const mongoQuery = Object.entries(filters).reduce((acc, [key, val]) => {
+      if (val !== undefined && val !== null) acc[key] = val;
+      return acc;
+    }, {});
+
+    const <%= name.toLowerCase() %>s = await this.<%= name.toLowerCase() %>Model
+      .find(mongoQuery)
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .exec();
+    return <%= name.toLowerCase() %>s.map((<%= name.toLowerCase() %>) => this.<%= name.toLowerCase() %>Mapper.to<%= moduleName %>ResponseDto(<%= name.toLowerCase() %>));
+  }
+}

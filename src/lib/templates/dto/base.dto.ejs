@@ -1,0 +1,81 @@
+<%- include('./imports.ejs') -%>
+
+export class Base<%- (name.charAt(0).toUpperCase() + name.slice(1)) %>Dto {
+  <%_ properties.forEach(prop => {
+    const isObjectId = prop.type.includes('ObjectId');
+    const isArray = prop.type.includes('[]');
+    const isNested = prop.type.includes('{') || prop.type.includes('}');
+    const isDate = prop.type.includes('Date');
+    const isRequired = prop.options.required === true || prop.options.required === 'true';
+    const propType = isObjectId ? 'string' : 
+                    isArray ? prop.type.replace('[]', '') + '[]' :
+                    isDate ? 'Date' :
+                    isNested ? 'any' :
+                    prop.type.replace('Types.', '').toLowerCase();
+  _%>
+  
+  <%_ if(withSwagger) { _%>
+  @ApiProperty({
+    <%_ if (isObjectId) { _%>
+    type: String,
+    description: <% if (prop.options.ref) { _%>'Reference to <%- prop.options.ref.replace(/'/g, '') %>'<%_ } else { _%>'MongoDB ObjectId'<%_ } _%>,
+    <%_ } else if (isDate) { _%>
+    type: String,
+    format: 'date-time',
+    <%_ } else if (prop.options.enum) { _%>
+    enum: <%- typeof prop.options.enum === 'string' ? prop.options.enum : JSON.stringify(prop.options.enum) %>,
+    <%_ } else { _%>
+    type: <% if (isArray) { _%>[<%- (propType.charAt(0).toUpperCase() + propType.slice(1)).replace('[]', '') %>]<%_ } else { _%><%- (propType.charAt(0).toUpperCase() + propType.slice(1)) %><%_ } _%>,
+    <%_ } _%>
+    <%_ if (isRequired) { _%>
+    required: true,
+    <%_ } else { _%>
+    required: false,
+    <%_ } _%>
+    <%_ if (prop.options.default) { _%>
+    default: <%- prop.options.default %>,
+    <%_ } _%>
+  })
+  <%_ } _%>
+  <%_ if (isRequired) { _%>
+  @IsNotEmpty()
+  <%_ } else { _%>
+  @IsOptional()
+  <%_ } _%>
+  <%_ if (isObjectId) { _%>
+  @IsMongoId()
+  <%_ } else if (prop.options.enum) { _%>
+  @IsEnum(<%- typeof prop.options.enum === 'string' ? prop.options.enum : JSON.stringify(prop.options.enum) %>)
+  <%_ } else if (prop.type === 'string') { _%>
+  @IsString()
+  <%_ } else if (prop.type === 'number') { _%>
+  @IsNumber()
+  <%_ } else if (prop.type === 'boolean') { _%>
+  @IsBoolean()
+  <%_ } else if (isArray) { _%>
+  @IsArray()
+  <%_ } else if (isDate) { _%>
+  @IsDateString()
+  <%_ } else if (isNested) { _%>
+  @ValidateNested()
+  @Type(() => any)
+  <%_ } _%>
+  <%_ if (prop.options.minlength) { _%>
+  @MinLength(<%- prop.options.minlength %>)
+  <%_ } _%>
+  <%_ if (prop.options.maxlength) { _%>
+  @MaxLength(<%- prop.options.maxlength %>)
+  <%_ } _%>
+  <%_ if (prop.options.min) { _%>
+  @Min(<%- prop.options.min %>)
+  <%_ } _%>
+  <%_ if (prop.options.max) { _%>
+  @Max(<%- prop.options.max %>)
+  <%_ } _%>
+  <%_ if (prop.options.match) { _%>
+  @Matches(<%- prop.options.match %>)
+  <%_ } _%>
+  <%- prop.name %> <%_ if(!isRequired) { _%> ? <%_ } %>: <%- propType %>;
+  <%_ }); _%>
+
+}

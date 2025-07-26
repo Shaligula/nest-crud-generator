@@ -1,0 +1,43 @@
+<%_ 
+  const moduleName = name.charAt(0).toUpperCase() + name.slice(1) 
+_%>
+<%_ if(withSwagger) { _%>
+import { ApiProperty, IntersectionType, PartialType } from '@nestjs/swagger';
+<%_ } else { _%>
+import { IntersectionType, PartialType } from '@nestjs/mapped-types';
+<%_ } _%>
+import { IsNumber, IsOptional, Min } from 'class-validator';
+import { Base<%= moduleName %>Dto } from './base-<%= name.toLowerCase() %>.dto';
+
+class Additional<%= moduleName %>Pagination {
+
+<% if(withSwagger) { _%>
+  @ApiProperty({
+    type: Number,
+    required: false,
+    minimum: 1,
+  })
+  <%_ } _%>
+  @IsOptional()
+  @IsNumber()
+  @Min(1)
+  page?: number;
+
+<% if(withSwagger) { _%>
+  @ApiProperty({
+    type: Number,
+    required: false,
+    minimum: 10,
+  })
+  <%_ } _%>
+  @IsOptional()
+  @IsNumber()
+  @Min(10)
+  limit?: number;
+  
+}
+
+export class Get<%= moduleName %>ListDto extends IntersectionType(
+  PartialType(Base<%= moduleName %>Dto),
+  Additional<%= moduleName %>Pagination,
+) {}

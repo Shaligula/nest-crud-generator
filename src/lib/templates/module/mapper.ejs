@@ -1,0 +1,25 @@
+<%_
+const moduleName = name.charAt(0).toUpperCase() + name.slice(1);
+_%>
+import { Injectable } from '@nestjs/common';
+import { <%= moduleName %>ResponseDto } from './dto/response-<%= name.toLowerCase() %>.dto';
+import { <%= documentName %> } from '../../<%= inputPath %>';
+
+@Injectable()
+export class <%= moduleName %>Mapper {
+  to<%= moduleName %>ResponseDto(<%= name.toLowerCase() %>: <%= documentName %>): <%= moduleName %>ResponseDto {
+    return {
+      _id: <%= name.toLowerCase() %>._id.toString(),
+      <%_ properties.forEach(prop => { 
+        const isObjectId = prop.type.includes('ObjectId');
+        const isRequired = prop.options.required === true || prop.options.required === 'true';
+      _%>
+      <%_ if (isObjectId) { _%>
+      <%= prop.name %>: <%= name.toLowerCase() %>.<%= prop.name %><%= isRequired ? '' : '?' %>.toString(),
+      <%_ } else { _%>
+      <%= prop.name %>: <%= name.toLowerCase() %>.<%= prop.name %>,
+      <%_ } _%>
+      <%_ }); _%>
+    };
+  }
+}

@@ -1,0 +1,20 @@
+<%_
+const moduleName = name.charAt(0).toUpperCase() + name.slice(1);
+_%>
+import { Module } from '@nestjs/common';
+import { MongooseModule } from '@nestjs/mongoose';
+import { <%= moduleName %>Controller } from './<%= name.toLowerCase() %>.controller';
+import { <%= moduleName %>Service } from './<%= name.toLowerCase() %>.service';
+import { <%= moduleName %>Mapper } from './<%= name.toLowerCase() %>.mapper';
+import { <%= name %>, <%= schemaName %> } from '../../<%= inputPath %>';
+
+@Module({
+  imports: [
+    MongooseModule.forFeature([
+      { name: <%= moduleName %>.name, schema: <%= moduleName %>Schema },
+    ]),
+  ],
+  controllers: [<%= moduleName %>Controller],
+  providers: [<%= moduleName %>Service, <%= moduleName %>Mapper],
+})
+export class <%= moduleName %>Module {}

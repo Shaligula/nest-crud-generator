@@ -1,0 +1,6 @@
+<%_ 
+  const moduleName = name.charAt(0).toUpperCase() + name.slice(1) 
+_%>
+import { Base<%= moduleName %>Dto } from './base-<%= name.toLowerCase() %>.dto';
+
+export class Create<%= moduleName %>Dto extends Base<%= moduleName %>Dto { }

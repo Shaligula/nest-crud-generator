@@ -1,0 +1,30 @@
+<%_ 
+  const moduleName = name.charAt(0).toUpperCase() + name.slice(1) 
+_%>
+<%_ if(withSwagger) { _%>
+import { ApiProperty, IntersectionType } from '@nestjs/swagger';
+<%_ } else { _%>
+import { IntersectionType } from '@nestjs/mapped-types';
+<%_ } _%>
+import { IsMongoId, IsNotEmpty } from 'class-validator';
+import { Base<%= moduleName %>Dto } from './base-<%= name.toLowerCase() %>.dto';
+
+class Additional<%= moduleName %>Id {
+
+<% if(withSwagger) { _%>
+  @ApiProperty({
+    type: String,
+    description: 'MongoDB ObjectId',
+    required: true
+  })
+  <%_ } _%>
+  @IsNotEmpty()
+  @IsMongoId()
+  _id: string;
+  
+}
+
+export class <%= moduleName %>ResponseDto extends IntersectionType(
+  Base<%= moduleName %>Dto,
+  Additional<%= moduleName %>Id,
+) {}

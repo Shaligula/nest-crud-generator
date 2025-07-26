@@ -1,0 +1,11 @@
+<%_ 
+  const moduleName = name.charAt(0).toUpperCase() + name.slice(1) 
+_%>
+<%_ if(withSwagger) { _%>
+import { PartialType } from '@nestjs/swagger';
+<%_ } else { _%>
+import { PartialType } from '@nestjs/mapped-types';
+<%_ } _%>
+import { Base<%= moduleName %>Dto } from './base-<%= name.toLowerCase() %>.dto';
+
+export class Update<%= moduleName %>Dto extends PartialType(Base<%= moduleName %>Dto) {}

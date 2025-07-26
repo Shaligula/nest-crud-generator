@@ -1,0 +1,87 @@
+<%_
+const moduleName = name.charAt(0).toUpperCase() + name.slice(1);
+_%>
+
+import { Body, Controller, Get, Param, Post, Patch, Delete, Query } from '@nestjs/common';
+<%_ if(withSwagger) { _%>
+import {
+  ApiOperation,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+<%_ } _%>
+import { <%= moduleName %>Service } from './<%= name.toLowerCase() %>.service';
+import { Create<%= moduleName %>Dto } from './dto/create-<%= name.toLowerCase() %>.dto';
+import { Update<%= moduleName %>Dto } from './dto/update-<%= name.toLowerCase() %>.dto';
+import { <%= moduleName %>ResponseDto } from './dto/response-<%= name.toLowerCase() %>.dto';
+import { Get<%= moduleName %>ListDto } from './dto/get-list-<%= name.toLowerCase() %>.dto';
+
+<% if(withSwagger) { _%>
+@ApiTags('<%= name.toLowerCase() %>')
+<%_ } _%>
+@Controller('<%= name.toLowerCase() %>')
+export class <%= moduleName %>Controller {
+  constructor(private readonly <%= name.toLowerCase() %>Service: <%= moduleName %>Service) {}
+  
+  @Post()
+  <%_ if(withSwagger) { _%>
+  @ApiOperation({ summary: 'Create <%= name.toLowerCase() %>' })
+  @ApiCreatedResponse({
+    description: 'The record has been successfully created.',
+    type: <%= moduleName %>ResponseDto,
+  })
+  <%_ } _%>
+  async create(@Body() create<%= moduleName %>Dto: Create<%= moduleName %>Dto): Promise<<%= moduleName %>ResponseDto> {
+    return this.<%= name.toLowerCase() %>Service.create(create<%= moduleName %>Dto);
+  }
+
+  @Patch(':id')
+  <%_ if(withSwagger) { _%>
+  @ApiOperation({ summary: 'Update <%= name.toLowerCase() %>' })
+  @ApiOkResponse({
+    description: 'The record has been successfully updated.',
+    type: <%= moduleName %>ResponseDto,
+  })
+  <%_ } _%>
+  async update(
+    @Param('id') id: string,
+    @Body() update<%= moduleName %>Dto: Update<%= moduleName %>Dto
+  ): Promise<<%= moduleName %>ResponseDto> {
+    return this.<%= name.toLowerCase() %>Service.update(id, update<%= moduleName %>Dto);
+  }
+
+  @Delete(':id')
+  <%_ if(withSwagger) { _%>
+  @ApiOperation({ summary: 'Delete <%= name.toLowerCase() %>' })
+  @ApiOkResponse({
+    description: 'The record has been successfully deleted.',
+  })
+  <%_ } _%>
+  async delete(@Param('id') id: string): Promise<void> {
+    this.<%= name.toLowerCase() %>Service.delete(id);
+  }
+
+  @Get(':id')
+  <%_ if(withSwagger) { _%>
+  @ApiOkResponse({
+    description: 'The found record',
+    type: <%= moduleName %>ResponseDto,
+  })
+  <%_ } _%>
+  async findOne(@Param('id') id: string): Promise<<%= moduleName %>ResponseDto> {
+    return this.<%= name.toLowerCase() %>Service.findOne(id);
+  }
+
+  @Get('/all')
+  <%_ if(withSwagger) { _%>
+  @ApiOkResponse({
+    description: 'The found records',
+    type: [<%= moduleName %>ResponseDto],
+  })
+  <%_ } _%>
+  async findAll(@Query() get<%= moduleName %>ListDto: Get<%= moduleName %>ListDto): Promise<<%= moduleName %>ResponseDto[]> {
+    return this.<%= name.toLowerCase() %>Service.findAll(get<%= moduleName %>ListDto);
+  }
+
+}

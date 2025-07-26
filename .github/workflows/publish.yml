@@ -1,0 +1,45 @@
+name: Publish to NPM
+
+on:
+  push:
+    branches:
+      - release
+  pull_request:
+    branches:
+      - release
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          registry-url: 'https://registry.npmjs.org/'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build package
+        run: npm run build
+
+      - name: Copy package.json to dist
+        run: jq 'del(.devDependencies, .scripts)' package.json > dist/package.json
+
+      - name: Copy README to dist
+        run: cp readme.md dist/README.md
+
+      - name: Minify JS/TS files in dist
+        run: npm run minify
+
+      - name: Publish to npm
+        run: |
+          cd dist
+          npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

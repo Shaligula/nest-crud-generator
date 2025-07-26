@@ -1,0 +1,45 @@
+<%_ 
+const imports = {
+  classValidator: new Set(),
+  classTransformer: false,
+  swagger: withSwagger,
+};
+
+properties.forEach(prop => {
+  const isObjectId = prop.type.includes('ObjectId');
+  const isArray = prop.type.includes('[]');
+  const isNested = prop.type.includes('{') || prop.type.includes('}');
+  const isDate = prop.type.includes('Date');
+  const isRequired = prop.options.required === true || prop.options.required === 'true';
+
+  if (isRequired) imports.classValidator.add('IsNotEmpty');
+  else { imports.classValidator.add('IsOptional') }
+  if (isObjectId) imports.classValidator.add('IsMongoId');
+  if (isDate) imports.classValidator.add('IsDateString');
+  if (prop.options.enum) imports.classValidator.add('IsEnum');
+  if (prop.type === 'string' && !prop.options.enum) imports.classValidator.add('IsString');
+  if (prop.type === 'number') imports.classValidator.add('IsNumber');
+  if (isArray) imports.classValidator.add('IsArray');
+  if (prop.type === 'boolean') imports.classValidator.add('IsBoolean');
+  
+  if (isNested) {
+    imports.classValidator.add('ValidateNested');
+    imports.classTransformer = true;
+  }
+
+  if (prop.options.minlength) imports.classValidator.add('MinLength');
+  if (prop.options.maxlength) imports.classValidator.add('MaxLength');
+  if (prop.options.min) imports.classValidator.add('Min');
+  if (prop.options.max) imports.classValidator.add('Max');
+  if (prop.options.match) imports.classValidator.add('Matches');
+});
+_%>
+<%_ if (imports.swagger) { _%>
+import { ApiProperty } from '@nestjs/swagger';
+<%_ } _%>
+<%_ if (imports.classValidator.size > 0) { _%>
+import { <%= [...imports.classValidator].sort().join(', ') %> } from 'class-validator';
+<%_ } _%>
+<%_ if (imports.classTransformer) { _%>
+import { Type } from 'class-transformer';
+<%_ } _%>
