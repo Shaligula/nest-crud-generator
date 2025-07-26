@@ -4,10 +4,10 @@
   "version": "1.0.0",
   "description": "CLI for generating NestJS CRUD from Mongoose models",
   "bin": {
-    "nest-mongoose-crud": "./cli/index.js"
+    "nest-mongoose-crud": "./src/cli/index.js"
   },
   "scripts": {
-    "build": "tsc && cpx \"src/**/*.ejs\" dist",
+    "build": "tsc && cpx \"src/**/*.ejs\" dist/src/",
     "lint": "eslint ./src/",
     "lint:fix": "eslint ./src/ --fix",
     "format": "prettier --write .",
