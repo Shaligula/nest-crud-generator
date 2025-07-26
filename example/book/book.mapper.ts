@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { BookResponseDto } from './dto/response-book.dto';
-import { BookDocument } from '../.././example/models/example.ts';
+import { BookDocument } from '../.././models/book.schema.ts';
 
 @Injectable()
 export class BookMapper {
