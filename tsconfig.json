@@ -6,7 +6,7 @@
     "skipLibCheck": true,
     "esModuleInterop": true,
     "sourceMap": false,
-    "outDir": "./dist",
+    "outDir": "./dist/src",
     "rootDir": "./src",
     "allowJs": true,
     "strict": true,
