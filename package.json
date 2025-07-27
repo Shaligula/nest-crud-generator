@@ -1,7 +1,7 @@
 {
   "name": "@shaligula/nest-crud-generator",
   "type": "commonjs",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "CLI for generating NestJS CRUD from Mongoose models",
   "bin": {
     "nest-crud-generator": "./src/cli/index.js"
