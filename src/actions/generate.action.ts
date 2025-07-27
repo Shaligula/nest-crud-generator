@@ -27,7 +27,7 @@ export class GenerateAction extends AbstractAction {
     const forceInput = inputs.find((input) => input.name === 'force');
     const forceEnabled = !!forceInput?.value;
 
-    const schemaInfo = MongooseParser.parseFile(pathInput.value.toString());
+    const schemaInfo = await MongooseParser.parseFile(pathInput.value.toString());
     if (!schemaInfo) {
       ConsoleUtil.redLog('Invalid schema');
       return;
@@ -58,34 +58,32 @@ export class GenerateAction extends AbstractAction {
     }
 
     const outputPath = await PathUtil.createOutputPath(outputValue, schemaInfo.name);
-    if (!forceEnabled) {
-      const pathIsEmpty = await PathUtil.checkIsEmpty(outputPath);
-      if (!pathIsEmpty) {
-        ConsoleUtil.redLog(`Path ${outputPath} is not empty`);
-        ConsoleUtil.whiteLog('Please use --force to overwrite');
-        ConsoleUtil.whiteLog('Or use --output <output path> to specify a different path');
-        return;
-      }
+
+    try {
+      await DtoGenerator.generate({
+        name: schemaInfo.name,
+        documentName: schemaInfo.documentName,
+        schemaName: schemaInfo.schemaName,
+        properties: schemaInfo.properties,
+        outputPath: outputPath,
+        withSwagger: swaggerEnabled,
+        inputPath: pathInput.value.toString(),
+        forceOverwrite: forceEnabled,
+      });
+  
+      await ModuleGenerator.generate({
+        name: schemaInfo.name,
+        documentName: schemaInfo.documentName,
+        schemaName: schemaInfo.schemaName,
+        properties: schemaInfo.properties,
+        outputPath: outputPath,
+        withSwagger: swaggerEnabled,
+        inputPath: pathInput.value.toString(),
+        forceOverwrite: forceEnabled,
+      });
     }
-
-    await DtoGenerator.generate({
-      name: schemaInfo.name,
-      documentName: schemaInfo.documentName,
-      schemaName: schemaInfo.schemaName,
-      properties: schemaInfo.properties,
-      outputPath: outputPath,
-      withSwagger: swaggerEnabled,
-      inputPath: pathInput.value.toString(),
-    });
-
-    await ModuleGenerator.generate({
-      name: schemaInfo.name,
-      documentName: schemaInfo.documentName,
-      schemaName: schemaInfo.schemaName,
-      properties: schemaInfo.properties,
-      outputPath: outputPath,
-      withSwagger: swaggerEnabled,
-      inputPath: pathInput.value.toString(),
-    });
+    catch(error) {
+      ConsoleUtil.redLog(error);
+    }
   }
 }

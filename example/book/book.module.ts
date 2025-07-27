@@ -3,7 +3,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { BookController } from './book.controller';
 import { BookService } from './book.service';
 import { BookMapper } from './book.mapper';
-import { Book, BookSchema } from '../models/book.schema';
+import { Book, BookSchema } from '../.././example/models/book.model.ts';
 
 @Module({
   imports: [

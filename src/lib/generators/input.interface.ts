@@ -8,4 +8,5 @@ export interface Input {
   inputPath: string;
   withSwagger: boolean;
   properties: OutputProperty[];
+  forceOverwrite: boolean;
 }

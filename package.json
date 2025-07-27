@@ -1,10 +1,10 @@
 {
-  "name": "@shaligula/nest-mongoose-crud",
+  "name": "@shaligula/nest-crud-generator",
   "type": "commonjs",
   "version": "1.0.0",
   "description": "CLI for generating NestJS CRUD from Mongoose models",
   "bin": {
-    "nest-mongoose-crud": "./src/cli/index.js"
+    "nest-crud-generator": "./src/cli/index.js"
   },
   "scripts": {
     "build": "tsc && cpx \"src/**/*.ejs\" dist/src/",
@@ -21,13 +21,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Shaligula/nest-mongoose-crud.git"
+    "url": "git+https://github.com/Shaligula/nest-crud-generator.git"
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Shaligula/nest-mongoose-crud/issues"
+    "url": "https://github.com/Shaligula/nest-crud-generator/issues"
   },
-  "homepage": "https://github.com/Shaligula/nest-mongoose-crud",
+  "homepage": "https://github.com/Shaligula/nest-crud-generator",
   "keywords": [
     "nestjs",
     "mongoose",
