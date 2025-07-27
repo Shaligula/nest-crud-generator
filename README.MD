@@ -3,10 +3,10 @@
 A CLI tool to automatically generate CRUD (Create, Read, Update, Delete) endpoints for Mongoose models in NestJS applications.
 
 Supports:
-✅ REST API generation
-✅ Swagger/OpenAPI documentation (optional)
-✅ Automatic DTOs with validation
-✅ Pagination & Filtering
+- ✅ REST API generation
+- ✅ Swagger/OpenAPI documentation (optional)
+- ✅ Automatic DTOs with validation
+- ✅ Pagination & Filtering
 
 ## Install
 
