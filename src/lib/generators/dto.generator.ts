@@ -14,9 +14,9 @@ export class DtoGenerator {
     await PathUtil.checkExistAndMakeDirectory(dtoDirectory);
     for (const template of DTOTemplates) {
       const dtoFileName = await this.generateFromTemplate(
+        input,
         templatesDirectory,
         template.template,
-        input,
         dtoDirectory,
         template.name
       );
@@ -25,9 +25,9 @@ export class DtoGenerator {
   }
 
   private static async generateFromTemplate(
+    input: Input,
     templatesDirectory: string,
     templateFileName: string,
-    input: Input,
     outputPath: string,
     outputFileName: string
   ): Promise<string> {
@@ -49,6 +49,12 @@ export class DtoGenerator {
 
     const fileName = `${outputFileName}-${input.name.toLowerCase()}.dto.ts`;
     const filePath = path.join(outputPath, fileName);
+    if(!input.forceOverwrite) {
+      const fileIsExist = await PathUtil.checkExists(filePath);
+      if(fileIsExist) {
+        throw new Error(`File ${filePath} already exists!\n\nUse --force to overwrite it.\n\nOr use --output <output path> to specify another path.`);
+      }
+    }
     fs.writeFileSync(filePath, content);
     return fileName;
   }

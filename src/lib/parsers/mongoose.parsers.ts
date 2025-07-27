@@ -6,11 +6,12 @@ import {
   PropertyDeclaration,
   SourceFile,
   TypeAliasDeclaration,
+  VariableDeclarationKind,
 } from 'ts-morph';
 import { Output, OutputProperty } from './output.interface';
 
 export class MongooseParser {
-  public static parseFile(filePath: string): Output | undefined {
+  public static async parseFile(filePath: string): Promise<Output | undefined> {
     const project = new Project();
     const sourceFile = project.addSourceFileAtPath(filePath);
     const classes = sourceFile.getClasses();
@@ -35,8 +36,8 @@ export class MongooseParser {
           }
         }
 
-        const documentName = this.checkExportDocumentExist(sourceFile, name);
-        const schemaName = this.checkExportSchemaExist(sourceFile, name);
+        const documentName = await this.checkExportDocumentExist(sourceFile, name);
+        const schemaName = await this.checkExportSchemaExist(sourceFile, name);
 
         return {
           ...schemaInfo,
@@ -82,10 +83,10 @@ export class MongooseParser {
     return propertyInfo;
   }
 
-  private static checkExportDocumentExist(
+  private static async checkExportDocumentExist(
     sourceFile: SourceFile,
     className: string
-  ): string | undefined {
+  ): Promise<string> {
     const typeAliases = sourceFile.getTypeAliases();
     for (const typeAlias of typeAliases) {
       if (typeAlias instanceof TypeAliasDeclaration) {
@@ -96,13 +97,27 @@ export class MongooseParser {
         }
       }
     }
-    return undefined;
+    return this.addExportDocumentType(sourceFile, className);
   }
 
-  private static checkExportSchemaExist(
+  private static async addExportDocumentType(
+    sourceFile: SourceFile,
+    className: string,
+  ): Promise<string> {
+    const name = `${className}Document`;
+    sourceFile.addTypeAlias({
+      name: name,
+      type: `HydratedDocument<${className}>`,
+      isExported: true,
+    });
+    await sourceFile.save();
+    return name;
+  }
+
+  private static async checkExportSchemaExist(
     sourceFile: SourceFile,
     className: string
-  ): string | undefined {
+  ): Promise<string> {
     const variableStatements = sourceFile.getVariableStatements();
 
     for (const statement of variableStatements) {
@@ -120,6 +135,23 @@ export class MongooseParser {
       }
     }
 
-    return undefined;
+    return this.addExportSchemaType(sourceFile, className);
+  }
+
+  private static async addExportSchemaType(
+    sourceFile: SourceFile,
+    className: string,
+  ): Promise<string> {
+    const name = `${className}Schema`;
+    sourceFile.addVariableStatement({
+      isExported: true,
+      declarationKind: VariableDeclarationKind.Const,
+      declarations: [{
+        name: name,
+        initializer: `SchemaFactory.createForClass(${className})`,
+      }],
+    });
+    await sourceFile.save();
+    return name;
   }
 }

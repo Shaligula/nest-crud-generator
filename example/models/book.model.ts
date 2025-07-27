@@ -110,4 +110,5 @@ export class Book {
 }
 
 export type BookDocument = HydratedDocument<Book>;
+
 export const BookSchema = SchemaFactory.createForClass(Book);
