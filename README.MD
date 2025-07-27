@@ -17,7 +17,7 @@ npm install -g @shaligula/nest-crud-generator
 ## Usage
 
 ```bash
-npx nest-crud-generator ./src/models/book.model.ts
+nest-crud-generator generate ./src/models/book.model.ts
 ```
 
 This will create:
@@ -39,7 +39,7 @@ This will create:
 *Example with options:*
 
 ```bash
-npx nest-crud-generator ./src/models/book.model.ts -o ./src/books --no-swagger -f
+nest-crud-generator generate ./src/models/book.model.ts -o ./src/books --no-swagger -f
 ```
 
 ## Example
